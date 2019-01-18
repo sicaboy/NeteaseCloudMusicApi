@@ -1,5 +1,4 @@
 const request = require('request');
-const wget = require('node-wget');
 const fs = require('fs');
 
 const host = global.host || 'http://localhost:3000';
@@ -24,6 +23,16 @@ let getUrl = (songId) => {
         })
     });
 }
+
+
+let download = function(uri, filename, callback){
+    request.head(uri, function(err, res, body){
+        console.log('content-type:', res.headers['content-type']);
+        console.log('content-length:', res.headers['content-length']);
+
+        request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+    });
+};
 
 module.exports = (query, request) => {
     const data = {
@@ -50,10 +59,15 @@ module.exports = (query, request) => {
                 let filename = `download/${songName}-${artistName}.mp3`;
                 let url = result.url;
                 if (!fs.existsSync(filename)) {
-                    wget({url: url, dest: filename});
+                    download(url, filename, function(){
+                        console.log(`${filename} - done`);
+                    });
                 }
             }).catch(err => {
                 console.log(err);
+                download('https://www.google.com/images/srpr/logo3w.png', 'google.png', function(){
+                    console.log('done');
+                });
             });
         }
     })
