@@ -17,6 +17,7 @@
   "dependencies": {
     "apicache": "^1.2.1",
     "express": "^4.16.3",
+    "node-wget": "^0.4.3",
     "request": "^2.85.0"
   },
   "devDependencies": {

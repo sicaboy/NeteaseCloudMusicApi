@@ -1,6 +1,8 @@
-const request = require('request')
-const host = global.host || 'http://localhost:3000'
+const request = require('request');
+const wget = require('node-wget');
+const fs = require('fs');
 
+const host = global.host || 'http://localhost:3000';
 
 let getUrl = (songId) => {
     const qs = {
@@ -10,12 +12,15 @@ let getUrl = (songId) => {
 
     return new Promise((resolve, reject) => {
         request.get({url: `${host}/song/url`, qs: qs}, (err, res, body) => {
-            if (!err && res.statusCode == 200) {
-                body = JSON.parse(body);
-                resolve(body.data[0]);
-            } else {
+            if (err || res.statusCode != 200) {
                 reject(err);
             }
+            body = JSON.parse(body);
+            let url = body.data[0].url || null;
+            if(url) {
+                resolve(url)
+            }
+            reject('No URL');
         })
     });
 }
@@ -42,8 +47,13 @@ module.exports = (query, request) => {
             }).join(' & ');
 
             getUrl(songId).then( result => {
-                console.log(`\n${songName}-${artistName}:`);
-                console.log(result.url);
+                let filename = `download/${songName}-${artistName}.mp3`;
+                let url = result.url;
+                if (!fs.existsSync(filename)) {
+                    wget({url: url, dest: filename});
+                }
+            }).catch(err => {
+                console.log(err);
             });
         }
     })
