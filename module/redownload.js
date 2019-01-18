@@ -8,13 +8,16 @@ let getUrl = (songId) => {
         br: 999000
     }
 
-    request.get({url: `${host}/song/url`,qs: qs}, (err, res, body) => {
-        if (!err && res.statusCode == 200) {
-            body = JSON.parse(body)
-            return body.data[0].url
-        }
-    })
-
+    return new Promise((resolve, reject) => {
+        request.get({url: `${host}/song/url`, qs: qs}, (err, res, body) => {
+            if (!err && res.statusCode == 200) {
+                body = JSON.parse(body);
+                resolve(body.data[0]);
+            } else {
+                reject(err);
+            }
+        })
+    });
 }
 
 module.exports = (query, request) => {
@@ -38,10 +41,10 @@ module.exports = (query, request) => {
                 return arItem.name;
             }).join(' & ');
 
-            let url = getUrl(songId);
-
-            console.log(url);
-
+            getUrl(songId).then( result => {
+                console.log(`\n${songName}-${artistName}:`);
+                console.log(result.url);
+            });
         }
     })
 
