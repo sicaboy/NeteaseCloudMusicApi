@@ -82,8 +82,10 @@ fs.readdirSync(path.join(__dirname, 'module')).reverse().forEach(file => {
     })
 })
 
-const port = process.env.PORT || 3000
-
+const port = process.env.PORT || 3000;
+process.on('uncaughtException', err => {
+      console.log(`Caught exception: ${err}\n`);
+});
 app.server = app.listen(port, () => {
     console.log(`server running @ http://localhost:${port}`)
 })

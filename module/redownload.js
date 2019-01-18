@@ -27,9 +27,6 @@ let getUrl = (songId) => {
 
 let download = function(uri, filename, callback){
     request.head(uri, function(err, res, body){
-        console.log('content-type:', res.headers['content-type']);
-        console.log('content-length:', res.headers['content-length']);
-
         request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
     });
 };
@@ -53,12 +50,13 @@ module.exports = (query, request) => {
             let songName = trackItem.name;
             let artistName = trackItem.ar.map( arItem => {
                 return arItem.name;
-            }).join(' & ');
+            }).join(' ');
 
             getUrl(songId).then( result => {
                 let filename = `download/${songName}-${artistName}.mp3`;
-                let url = result.url;
-                if (!fs.existsSync(filename)) {
+                let url = result;
+                if ( url != undefined && url.length > 0 && !fs.existsSync(filename)) {
+                    console.log(url);
                     download(url, filename, function(){
                         console.log(`${filename} - done`);
                     });
