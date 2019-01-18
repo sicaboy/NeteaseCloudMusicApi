@@ -46,9 +46,9 @@ app.use((req, res, next) => {
 // body parser
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
-
-// cache
-app.use(cache('2 minutes', ((req, res) => res.statusCode === 200)))
+//
+// // cache
+// app.use(cache('2 minutes', ((req, res) => res.statusCode === 200)))
 
 // static
 app.use(express.static(path.join(__dirname, 'public')))
@@ -64,7 +64,7 @@ fs.readdirSync(path.join(__dirname, 'module')).reverse().forEach(file => {
     if(!(/\.js$/i.test(file))) return
     let route = (file in special) ? special[file] : '/' + file.replace(/\.js$/i, '').replace(/_/g, '/')
     let question = require(path.join(__dirname, 'module', file))
-    
+
     app.use(route, (req, res) => {
         let query = Object.assign({}, req.query, req.body, {cookie: req.cookies})
         question(query, request)
